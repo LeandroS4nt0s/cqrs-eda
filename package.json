@@ -1,0 +1,39 @@
+{
+  "name": "cqrs-eda",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --coverage",
+    "test:watch": "vitest --watch"
+  },
+  "keywords": [
+    "cqrs",
+    "eda",
+    "typescript",
+    "event-driven",
+    "command-pattern",
+    "observer-pattern",
+    "decorators"
+  ],
+  "author": "Leandro Santos",
+  "license": "MIT",
+  "description": "Lightweight CQRS and Event-Driven Architecture library using TypeScript decorators, handlers and typings. Perfect for scalable event-driven apps.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seu-usuario/cqrs-eda.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seu-usuario/cqrs-eda/issues"
+  },
+  "homepage": "https://github.com/seu-usuario/cqrs-eda#readme",
+  "devDependencies": {
+    "@types/node": "^24.2.1",
+    "@vitest/coverage-v8": "^3.2.4",
+    "reflect-metadata": "^0.2.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

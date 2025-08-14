@@ -1,0 +1,12 @@
+import { Command } from "./commands/decorators";
+import { Observer } from "./observers/decorators";
+import { Query } from "./queries/decorators";
+
+import { CommandHandler } from "./commands/handler";
+import { QueryHandler } from "./queries/handler";
+import { ObserverHandler } from "./observers/handler";
+
+export { ICommand, IObserver, IQuery } from "./types/base";
+
+export const Decorators = { Command, Query, Observer };
+export const Handlers = { CommandHandler, QueryHandler, ObserverHandler };
