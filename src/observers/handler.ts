@@ -55,4 +55,13 @@ export class ObserverHandler<O extends Record<string, any>>
       await observer.execute(payload);
     }
   }
+
+  /**
+   * Returns all events names registered.
+   *
+   */
+
+  public getRegisteredEventNames(): (keyof O)[] {
+    return Array.from(this.observers.keys());
+  }
 }
