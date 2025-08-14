@@ -1,6 +1,7 @@
 import { Constructor } from "../types/base";
 
-const observerRegistry = new Map<string, Constructor[]>();
+// Registry mapping event names to arrays of observer class constructors
+const observerRegistry: Map<string, Constructor[]> = new Map();
 
 /**
  * Decorator to register a class as an Observer for a specific event.
@@ -18,6 +19,11 @@ export function Observer(eventName: string) {
   };
 }
 
-export function getObserverRegistry() {
+/**
+ * Retrieves the entire observer registry.
+ *
+ * @returns Map where keys are event names and values are arrays of observer constructors.
+ */
+export function getObserverRegistry(): Map<string, Constructor[]> {
   return observerRegistry;
 }

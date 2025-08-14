@@ -1,4 +1,4 @@
-import { IObserver, Constructor } from "../types/base";
+import { IObserver, Constructor, IObserverHandler } from "../types/base";
 import { getObserverRegistry } from "./decorators";
 
 /**
@@ -7,7 +7,9 @@ import { getObserverRegistry } from "./decorators";
  *
  * @template O - A mapping of event names to their payload types.
  */
-export class ObserverHandler<O extends Record<string, any>> {
+export class ObserverHandler<O extends Record<string, any>>
+  implements IObserverHandler<O>
+{
   // Map of event names to arrays of observer instances
   private observers = new Map<keyof O, IObserver[]>();
 

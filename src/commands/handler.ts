@@ -1,4 +1,4 @@
-import { ICommand } from "../types/base";
+import { ICommand, Constructor, ICommandHandler } from "../types/base";
 import { getCommandRegistry } from "./decorators";
 
 /**
@@ -17,7 +17,9 @@ import { getCommandRegistry } from "./decorators";
  * await commandHandler.fire("CREATE_USER", { name: "Leandro" });
  * ```
  */
-export class CommandHandler<C extends Record<string, any>> {
+export class CommandHandler<C extends Record<string, any>>
+  implements ICommandHandler<C>
+{
   // Map of command names to command instances
   private commands = new Map<keyof C, ICommand>();
 
@@ -30,7 +32,7 @@ export class CommandHandler<C extends Record<string, any>> {
    * const handler = new CommandHandler((cls) => container.resolve(cls));
    * ```
    */
-  constructor(private factory?: (cls: any) => any) {
+  constructor(private factory?: (cls: Constructor) => any) {
     const registry = getCommandRegistry();
 
     for (const [name, CommandClass] of registry.entries()) {

@@ -7,6 +7,14 @@ const queryRegistry = new Map<string, Constructor>();
  *
  * @param name Unique identifier for the query.
  * @throws Error if a query with the given name is already registered.
+ *
+ * @example
+ * ```ts
+ * @Query("GET_USER")
+ * export class GetUserQuery implements IQuery<{ id: number }, User> {
+ *   async execute(params) { ... }
+ * }
+ * ```
  */
 export function Query(name: string) {
   return function (target: Constructor) {

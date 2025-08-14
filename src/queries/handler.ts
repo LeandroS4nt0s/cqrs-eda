@@ -1,4 +1,4 @@
-import { Constructor, IQuery } from "../types/base";
+import { Constructor, IQuery, IQueryHandler } from "../types/base";
 import { getQueryRegistry } from "./decorators";
 
 /**
@@ -24,7 +24,8 @@ import { getQueryRegistry } from "./decorators";
 export class QueryHandler<
   Q extends Record<string, any>,
   R extends { [K in keyof Q]: any }
-> {
+> implements IQueryHandler<Q, R>
+{
   // Map of query names to query instances
   private queries = new Map<keyof Q, IQuery<any, any>>();
 
