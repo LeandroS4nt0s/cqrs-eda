@@ -1,9 +1,11 @@
 {
   "name": "cqrs-eda",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
+    "build": "tsc",
     "test": "vitest run --coverage",
     "test:watch": "vitest --watch"
   },
