@@ -6,7 +6,14 @@ import { CommandHandler } from "./commands/handler";
 import { QueryHandler } from "./queries/handler";
 import { ObserverHandler } from "./observers/handler";
 
-export { ICommand, IObserver, IQuery } from "./types/base";
+export {
+  ICommand,
+  IObserver,
+  IQuery,
+  ICommandHandler,
+  IObserverHandler,
+  IQueryHandler,
+} from "./types/base";
 
 export const Decorators = { Command, Query, Observer };
 export const Handlers = { CommandHandler, QueryHandler, ObserverHandler };
