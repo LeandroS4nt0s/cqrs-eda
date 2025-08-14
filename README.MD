@@ -120,7 +120,6 @@ const observerHandler = new ObserverHandler((cls) => container.resolve(cls));
 - `ICommand<Payload>`
 - `IQuery<Params, Result>`
 - `IObserver<Payload>`
-- `Constructor<T>`
 
 Provides full TypeScript typing to prevent runtime errors.
 
