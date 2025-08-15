@@ -5,6 +5,7 @@ import { Query } from "./queries/decorators";
 import { CommandHandler } from "./commands/handler";
 import { QueryHandler } from "./queries/handler";
 import { ObserverHandler } from "./observers/handler";
+import { loadDecoratedClasses } from "./utils/loadDecoratedClasses";
 
 export {
   ICommand,
@@ -17,3 +18,4 @@ export {
 
 export const Decorators = { Command, Query, Observer };
 export const Handlers = { CommandHandler, QueryHandler, ObserverHandler };
+export const Utilities = { loadDecoratedClasses };
