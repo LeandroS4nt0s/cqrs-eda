@@ -1,19 +1,18 @@
 # CQRS-EDA 🚀
 
-CQRS-EDA is a lightweight and powerful **TypeScript/JavaScript** library implementing **CQRS** (Command Query Responsibility Segregation) and **EDA** (Event-Driven Architecture) patterns.
-It provides decorators and handlers for **Commands**, **Queries**, and **Observers**, allowing you to build scalable, decoupled, and testable systems.
+CQRS-EDA is a lightweight **TypeScript/JavaScript** library designed to **complement CQRS and Event-Driven Architecture patterns** in your applications. It provides decorators, handlers, and utilities to manage **Commands**, **Queries**, and **Observers** in a scalable and strongly-typed way.
 
 ---
 
-## 💡 Features
+## 💡 Why Use CQRS-EDA?
 
-- **Command Handler**: register and execute typed commands.
-- **Query Handler**: register and execute typed queries with return values.
-- **Observer Handler**: register and publish events to multiple observers.
+CQRS-EDA is built to **enhance your implementation** of CQRS and EDA without enforcing them. By using CQRS-EDA, you can:
 
-  - Observers act as **queue consumers**, compatible with **any queue technology** (RabbitMQ, Kafka, SQS, Redis Streams, etc.).
-
-- Optional **Dependency Injection** integration for customized instance creation.
+- Decouple your business logic from the infrastructure.
+- Easily manage and organize commands, queries, and observers.
+- Ensure strong typing and autocompletion in TypeScript.
+- Integrate seamlessly with DI containers or use without DI.
+- Improve maintainability, testability, and scalability.
 
 ---
 
@@ -31,97 +30,164 @@ yarn add cqrs-eda
 
 ---
 
-## 🎨 Library Structure
+## 🏗️ Library Structure
 
 ```ts
-import { Decorators, Handlers, ICommand, IObserver, IQuery } from "cqrs-eda";
+import {
+  Decorators,
+  Handlers,
+  Utilities,
+  ICommand,
+  IObserver,
+  IQuery,
+} from "cqrs-eda";
 
 const { Command, Query, Observer } = Decorators;
 const { CommandHandler, QueryHandler, ObserverHandler } = Handlers;
 ```
 
-- `Decorators`: `Command`, `Query`, `Observer`
-- `Handlers`: `CommandHandler`, `QueryHandler`, `ObserverHandler`
-- Interfaces: `ICommand`, `IQuery`, `IObserver`
+- **Decorators**: `Command`, `Query`, `Observer`
+- **Handlers**: `CommandHandler`, `QueryHandler`, `ObserverHandler`
+- **Utilities**: `registerDecoratedClasses`
+- **Interfaces**: `ICommand`, `IQuery`, `IObserver`
 
 ---
 
-## 🛠️ Usage Examples
+## 🛠️ Quick Start
 
-### Command
+### 1️⃣ Without Dependency Injection
 
 ```ts
-import { Command, CommandHandler, ICommand } from "cqrs-eda";
+import {
+  Command,
+  CommandHandler,
+  Query,
+  QueryHandler,
+  Observer,
+  ObserverHandler,
+} from "cqrs-eda";
 
 @Command("CREATE_USER")
-class CreateUserCommand implements ICommand<{ name: string }> {
-  async execute(payload: { name: string }): Promise<void> {
-    console.log("Creating user:", payload.name);
+class CreateUserCommand {
+  async execute(payload: { name: string }) {
+    console.log("User created:", payload.name);
   }
 }
 
-const commandHandler = new CommandHandler();
-await commandHandler.fire("CREATE_USER", { name: "Leandro" });
-```
-
-### Query
-
-```ts
-import { Query, QueryHandler, IQuery } from "cqrs-eda";
-
 @Query("GET_USER")
-class GetUserQuery implements IQuery<{ id: number }, string | null> {
+class GetUserQuery {
   async execute(params: { id: number }): Promise<string | null> {
     return `User ${params.id}`;
   }
 }
 
-const queryHandler = new QueryHandler<
-  { GET_USER: { id: number } },
-  { GET_USER: string | null }
->();
-const user = await queryHandler.fire("GET_USER", { id: 1 });
-console.log(user);
-```
-
-### Observer (Queue Consumer)
-
-```ts
-import { Observer, ObserverHandler, IObserver } from "cqrs-eda";
-
 @Observer("USER_CREATED")
-class SendWelcomeEmailObserver implements IObserver<{ userId: number }> {
-  async execute(payload: { userId: number }): Promise<void> {
-    console.log("Sending welcome email to user:", payload.userId);
+class SendWelcomeEmailObserver {
+  async execute(payload: { userId: number }) {
+    console.log("Sending email to user:", payload.userId);
   }
 }
 
+// Handlers
+const commandHandler = new CommandHandler();
+const queryHandler = new QueryHandler();
 const observerHandler = new ObserverHandler();
+
+// Execute
+await commandHandler.fire("CREATE_USER", { name: "Leandro" });
+const user = await queryHandler.fire("GET_USER", { id: 1 });
 await observerHandler.publish("USER_CREATED", { userId: 1 });
 ```
 
-> ⚠️ Observers can be used as **consumers for any queue technology**, such as RabbitMQ, Kafka, AWS SQS, or Redis Streams.
-
----
-
-## 🔧 Dependency Injection Support
-
-You can pass a factory function to handlers to integrate with any DI container:
+### 2️⃣ With Dependency Injection (tsyringe)
 
 ```ts
-const commandHandler = new CommandHandler((cls) => container.resolve(cls));
-const observerHandler = new ObserverHandler((cls) => container.resolve(cls));
+import { container } from "tsyringe";
+import {
+  CommandHandler,
+  QueryHandler,
+  ObserverHandler,
+  Utilities,
+} from "cqrs-eda";
+import {
+  CommandMappers,
+  QueryMappers,
+  QueryResultMappers,
+  EventMappers,
+} from "./mappers";
+import * as Commands from "./commands";
+import * as Queries from "./queries";
+import * as Observers from "./observers";
+
+// Register all decorated classes
+Utilities.registerDecoratedClasses({
+  commands: Commands,
+  queries: Queries,
+  observers: Observers,
+});
+
+// Handlers with DI
+const commandHandler = new CommandHandler<CommandMappers>((cls) =>
+  container.resolve(cls)
+);
+const queryHandler = new QueryHandler<QueryMappers, QueryResultMappers>((cls) =>
+  container.resolve(cls)
+);
+const observerHandler = new ObserverHandler<EventMappers>((cls) =>
+  container.resolve(cls)
+);
+
+container.registerInstance(CommandHandler, commandHandler);
+container.registerInstance(QueryHandler, queryHandler);
+container.registerInstance(ObserverHandler, observerHandler);
 ```
 
 ---
 
-## 📦 Types and Interfaces
+## 🧩 Strong Typing with Mappers
 
-- `ICommand<Payload>`
-- `IQuery<Params, Result>`
-- `IObserver<Payload>`
+CQRS-EDA uses **mapper types** to ensure commands, queries, and observers are **fully typed**.
 
-Provides full TypeScript typing to prevent runtime errors.
+```ts
+type CommandMappers = {
+  SAVE_SEGMENT: IndexPronunciationResponse;
+};
+
+type QueryMappers = {
+  GET_SEGMENT: { phrase: string; accent: string };
+};
+
+type QueryResultMappers = {
+  GET_SEGMENT: PronunciationSegmentEntity;
+};
+
+type EventMappers = {
+  "SEGMENT.SAVED": IndexPronunciationResponse;
+};
+```
+
+**Benefits:**
+
+- Compile-time safety for all commands, queries, and events.
+- IDE autocompletion.
+- Reduced runtime errors.
+
+---
+
+## 🔧 Utilities: `registerDecoratedClasses`
+
+- Automatically registers decorated classes for handlers.
+- Supports both `import * as` and array exports.
+- Ensures all decorated classes are recognized by their respective handlers.
+
+---
+
+## ⚡ Benefits of CQRS-EDA
+
+- Complements **CQRS and EDA patterns** without enforcing them.
+- Simplifies registration and execution of commands, queries, and observers.
+- Strong typing improves **developer experience**.
+- Flexible DI support integrates easily with existing architecture.
 
 ---
 
