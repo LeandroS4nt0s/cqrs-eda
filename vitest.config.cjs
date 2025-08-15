@@ -1,6 +1,5 @@
-import { defineConfig } from "vitest/config";
-
-export default defineConfig({
+/** @type {import('vitest/config').UserConfig} */
+module.exports = {
   test: {
     globals: true,
     environment: "node",
@@ -10,10 +9,11 @@ export default defineConfig({
       reportsDirectory: "coverage",
       exclude: [
         "src/index.ts",
+        "dist",
         "src/types/**",
         "src/**/*.d.ts",
-        "vitest.config.ts",
+        "vitest.config.cjs",
       ],
     },
   },
-});
+};

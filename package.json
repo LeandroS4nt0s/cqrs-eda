@@ -14,7 +14,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build": "npm run build:cjs && npm run build:esm",
-    "test": "vitest run --coverage",
+    "test": "vitest run --coverage --config vitest.config.cjs",
     "test:watch": "vitest --watch"
   },
   "keywords": [
