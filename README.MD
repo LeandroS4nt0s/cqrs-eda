@@ -147,6 +147,61 @@ container.registerInstance(ObserverHandler, observerHandler);
 
 ---
 
+## 📡 Using Observers with Message Queues
+
+You can easily integrate **CQRS-EDA Observers** with message queues (e.g., RabbitMQ).
+Instead of writing consumers for each queue manually, let the **ObserverHandler** dispatch events to your registered observers.
+
+### Example: Startup Integration
+
+```ts
+import { container } from "tsyringe";
+import { IQueueService } from "@infra/services/external/QueueService/QueueServiceInterface";
+import logger from "@shared/utils/logger";
+import { ObserverHandler } from "@application/handlers";
+
+export async function onStartupQueueTask() {
+  const queueService = container.resolve<IQueueService>("QueueService");
+
+  // Start queue connection
+  await queueService.start();
+  const channel = queueService.getChannel();
+
+  // Resolve the ObserverHandler (provided by cqrs-eda; re-exported by your app)
+  const observerHandler = container.resolve(ObserverHandler);
+
+  // Bind each registered observer to a queue
+  for (const eventName of observerHandler.getRegisteredEventNames()) {
+    await channel.assertQueue(eventName, { durable: true });
+
+    channel.consume(eventName, async (msg) => {
+      if (!msg) return;
+
+      try {
+        const payload = JSON.parse(msg.content.toString());
+
+        // Publish the event to all registered observers
+        await observerHandler.publish(eventName, payload);
+
+        channel.ack(msg);
+      } catch (error) {
+        logger.error(error);
+        channel.nack(msg, false, false);
+      }
+    });
+  }
+}
+```
+
+### How It Works
+
+1. **QueueService** connects to the broker and provides a channel.
+2. **ObserverHandler** manages all registered observers for event names.
+3. Each incoming message is parsed and **published** to observers by event name.
+4. No need for per-queue consumers—just register observers and they react to queue events.
+
+---
+
 ## 🧩 Strong Typing with Mappers
 
 CQRS-EDA uses **mapper types** to ensure commands, queries, and observers are **fully typed**.
