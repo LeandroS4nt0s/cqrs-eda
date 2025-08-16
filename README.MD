@@ -65,24 +65,27 @@ import {
   QueryHandler,
   Observer,
   ObserverHandler,
+  ICommand,
+  IQuery,
+  IObserver,
 } from "cqrs-eda";
 
 @Command("CREATE_USER")
-class CreateUserCommand {
+class CreateUserCommand implements ICommand<{ name: string }> {
   async execute(payload: { name: string }) {
     console.log("User created:", payload.name);
   }
 }
 
 @Query("GET_USER")
-class GetUserQuery {
+class GetUserQuery implements IQuery<{ id: number }, string | null> {
   async execute(params: { id: number }): Promise<string | null> {
     return `User ${params.id}`;
   }
 }
 
 @Observer("USER_CREATED")
-class SendWelcomeEmailObserver {
+class SendWelcomeEmailObserver implements IObserver<{ userId: number }> {
   async execute(payload: { userId: number }) {
     console.log("Sending email to user:", payload.userId);
   }
